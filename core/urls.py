@@ -19,8 +19,10 @@ from django.urls import path
 from django.conf import settings
 from django.conf.urls import include
 from django.conf.urls.static import static
+from django.http import HttpResponse
 
 urlpatterns = [
+    path('', lambda request: HttpResponse("OK")),
     path('admin/', admin.site.urls),
     path('api/', include('imaging.urls')),
 ]
