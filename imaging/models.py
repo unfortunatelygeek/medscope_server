@@ -28,9 +28,7 @@ class DermatoImage(models.Model):
 
 #dummy for now
 class OtoImage(BaseImage):
-    # Additional fields specific to otoscopy
     ear_side = models.CharField(max_length=5, choices=[('left', 'Left'), ('right', 'Right')], null=True, blank=True)
 
 class PharyngoImage(BaseImage):
-    # Additional fields specific to pharyngoscopy
     region = models.CharField(max_length=50, null=True, blank=True)
