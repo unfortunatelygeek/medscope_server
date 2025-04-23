@@ -1,0 +1,65 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+env/
+venv/
+build/
+dist/
+eggs/
+.eggs/
+lib64/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.whl
+MANIFEST.in
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Translations
+*.mo
+*.pot
+
+# Django stuff:
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+media
+
+# Celery / RabbitMQ
+celerybeat.pid
+celeryd.pid
+celeryd.log
+
+# Environment variables
+.env
+
+# Spyder project settings
+.spyproject
+
+# VS Code
+.vscode/
+
+# PyCharm / IntelliJ IDEA
+.idea/
+*.iml
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# OS Specific files (macOS)
+.DS_Store
