@@ -3,8 +3,8 @@ import requests
 from PIL import Image
 import io
 
-UPLOAD_URL = "http://localhost:8000/api/upload/"
-REPORT_URL = "http://localhost:8000/api/generate-report/"
+UPLOAD_URL = "http://localhost:8000/api/upload/dermato/"
+REPORT_URL = "http://localhost:8000/api/report/dermato/"
 
 CATEGORIES = {
     "Total Body Mapping": "total_body",
@@ -17,8 +17,8 @@ CATEGORIES = {
     "Close-up Dermoscopy": "closeup"
 }
 
-st.title("🧪 Dermatoscopic Image Uploader & Report Generator")
-tab1, tab2 = st.tabs(["📤 Upload Images", "📄 Generate Report"])
+st.title("Medscope Image Uploader & Report Generator")
+tab1, tab2 = st.tabs(["Upload Images", "Generate Report"])
 
 with tab1:
     st.subheader("Upload Dermatoscopic Images")
@@ -27,7 +27,7 @@ with tab1:
     uploaded_files = st.file_uploader("Choose image files", type=["jpg", "png", "jpeg"], accept_multiple_files=True)
 
     if uploaded_files:
-        st.markdown("### 🖼️ Image Preview")
+        st.markdown("### Image Preview")
         for f in uploaded_files:
             img = Image.open(f)
             st.image(img, caption=f.name, width=200)
@@ -60,9 +60,9 @@ with tab2:
         if res.status_code == 200:
             st.success("Report generated successfully!")
             st.download_button(
-                label="📥 Download Report",
+                label="Download Report",
                 data=res.content,
-                file_name="dermato_report.pdf",
+                file_name="its_ya_boi.pdf",
                 mime="application/pdf"
             )
         else:

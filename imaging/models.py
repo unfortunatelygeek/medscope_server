@@ -1,5 +1,14 @@
 from django.db import models
 
+class BaseImage(models.Model):
+    image = models.ImageField(upload_to='scans/')
+    category = models.CharField(max_length=100, default='default')
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+    processed = models.BooleanField(default=False)
+    
+    class Meta:
+        abstract = True
+
 class DermatoImage(models.Model):
     CATEGORY_CHOICES = [
         ('total_body', 'Total Body Mapping'),
@@ -15,3 +24,13 @@ class DermatoImage(models.Model):
     image = models.ImageField(upload_to='uploads/')
     category = models.CharField(max_length=100, choices=CATEGORY_CHOICES)
     uploaded_at = models.DateTimeField(auto_now_add=True)
+
+
+#dummy for now
+class OtoImage(BaseImage):
+    # Additional fields specific to otoscopy
+    ear_side = models.CharField(max_length=5, choices=[('left', 'Left'), ('right', 'Right')], null=True, blank=True)
+
+class PharyngoImage(BaseImage):
+    # Additional fields specific to pharyngoscopy
+    region = models.CharField(max_length=50, null=True, blank=True)
