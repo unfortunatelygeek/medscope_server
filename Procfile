@@ -1,1 +1,1 @@
-web: gunicorn medscope_server.wsgi:application
+web: gunicorn medscope_server.core.wsgi:application
