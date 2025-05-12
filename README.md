@@ -1,4 +1,4 @@
-### MedScope: Smart Imaging System for Ear, Throat, and Skin Diagnostics
+# MedScope: Smart Imaging System for Ear, Throat, and Skin Diagnostics
 MedScope is an AI-powered platform designed for diagnostic imaging, specifically for otoscopy, pharyngoscopy, and dermatoscopy. The system integrates various ML models to analyze images, generate diagnostic reports, and provide recommendations.
 
 Project Structure
