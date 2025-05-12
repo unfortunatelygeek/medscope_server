@@ -15,5 +15,5 @@ class OtoReportView(APIView):
             return Response({"error": "No images found"}, status=404)
 
         report_path = "media/oto_report.pdf"
-        generate_pdf_report(images, file_path=report_path, report_type="otoscopy")
+        generate_pdf_report(images, report_type="otoscopy", file_path=report_path)
         return FileResponse(open(report_path, 'rb'), as_attachment=True, filename='oto_report.pdf')
