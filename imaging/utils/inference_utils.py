@@ -1,9 +1,10 @@
 import requests
 import os
 import base64
-from dotenv import load_dotenv
 
-load_dotenv()
+if os.environ.get("RENDER") is None:  # Render sets its own env vars
+    from dotenv import load_dotenv
+    load_dotenv()
 
 ROBOFLOW_API_KEY = os.getenv("ROBOFLOW_API_KEY")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
