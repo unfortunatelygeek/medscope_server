@@ -63,3 +63,5 @@ celeryd.log
 
 # OS Specific files (macOS)
 .DS_Store
+
+phar_frontend.py

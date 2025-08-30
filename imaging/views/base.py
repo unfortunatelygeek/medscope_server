@@ -1,77 +1,58 @@
+# imaging/views/base.py
 from rest_framework.views import APIView
-from rest_framework.parsers import MultiPartParser
 from rest_framework.response import Response
-from rest_framework import status
-from django.core.files.base import ContentFile
-from PIL import Image, UnidentifiedImageError
-import io
-import traceback
+from django.http import FileResponse
+from ..utils.pdf_utils import generate_pdf_report
+from ..utils.inference_utils import get_roboflow_prediction, get_gemini_report
 
 class BaseImageUploadView(APIView):
-    parser_classes = [MultiPartParser]
-    model_class = None  #to be set by subclasses
-    
-    def process_image(self, file, category):
-        try:
-            file.seek(0)  # Ensure reading from beginning
-            img = Image.open(file)
-            img = img.convert("RGB")
-            img_resized = img.resize((224, 224))
-            
-            buffer = io.BytesIO()
-            img_resized.    save(buffer, format="JPEG")
-            buffer.seek(0)
-            
-            image_model = self.model_class(category=category)
-            image_model.image.save(file.name, ContentFile(buffer.getvalue()))
-            image_model.save()
+    """
+    Generic upload view for any scan category.
+    Subclasses must define: model_class
+    """
+    model_class = None
 
-            self.post_process_hook(image_model)
-            
-            return {
-                "id": image_model.id,
-                "category": image_model.category,
-                "name": file.name
-            }
-        except UnidentifiedImageError:
-            raise ValueError(f"Unidentified image format: {file.name}")
-        except Exception as e:
-            traceback.print_exc()
-            raise ValueError(f"Failed to process {file.name}: {str(e)}")
-    
-    def post_process_hook(self, image_model):
-        """
-        Hook for subclasses to implement post-processing of images
-        Default implementation does nothing, base hi hai ye
-        """
-        pass
+    def post(self, request):
+        if not self.model_class:
+            return Response({"error": "No model_class defined"}, status=500)
 
-    def post(self, request, format=None):
-        files = request.FILES.getlist("images")
-        category = request.POST.get("category", "default")
-        
-        print("=" * 60)
-        print(f"{self.__class__.__name__} Request Received")
-        print("FILES:", [f.name for f in files])
-        print("CATEGORY:", category)
-        
-        if not files:
-            return Response({"error": "No images uploaded"}, status=400)
-        
-        responses = []
-        
-        for file in files:
-            print("-" * 60)
-            print(f"🔍 Processing file: {file.name}")
-            print(f"   - Size: {file.size}")
-            print(f"   - Content type: {file.content_type}")
-            
-            try:
-                result = self.process_image(file, category)
-                responses.append(result)
-                print(f"Successfully saved image record with ID {result['id']}")
-            except ValueError as e:
-                return Response({"error": str(e)}, status=400)
-        
-        print("All images processed successfully")
-        return Response(responses, status=status.HTTP_201_CREATED)
+        images = request.FILES.getlist("images")
+        if not images:
+            return Response({"error": "No images provided"}, status=400)
+
+        objs = [self.model_class.objects.create(image=img) for img in images]
+        return Response({"uploaded": len(objs)}, status=201)
+
+
+class BaseReportView(APIView):
+    """
+    Generic report view for any scan category.
+    Subclasses must define: model_class, report_type, roboflow_model_id
+    """
+    model_class = None
+    report_type = None
+    roboflow_model_id = None
+
+    def get(self, request):
+        if not self.model_class:
+            return Response({"error": "No model_class defined"}, status=500)
+
+        images = self.model_class.objects.all().order_by("uploaded_at")
+        if not images:
+            return Response({"error": "No images found"}, status=404)
+
+        predictions = []
+        for img in images:
+            image_path = img.image.path
+            prediction = get_roboflow_prediction(image_path, self.roboflow_model_id)
+            gemini_report = get_gemini_report(image_path, prediction)
+            predictions.append({
+                "image": image_path,
+                "prediction": prediction,
+                "gemini_report": gemini_report,
+            })
+
+        report_path = f"media/{self.report_type}_report.pdf"
+        generate_pdf_report(images, report_type=self.report_type, file_path=report_path, extra_info=predictions)
+
+        return FileResponse(open(report_path, "rb"), as_attachment=True, filename=f"{self.report_type}_report.pdf")
