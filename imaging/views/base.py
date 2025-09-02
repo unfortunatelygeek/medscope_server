@@ -19,6 +19,7 @@ class ImageUploadSerializer(serializers.Serializer):
 class PredictionResponseSerializer(serializers.Serializer):
     image = serializers.CharField()
     transformed_image = serializers.CharField()
+    transformed_image_base64 = serializers.CharField()
     prediction = serializers.JSONField()
     confidence = serializers.FloatField(required=False)
     recommendation = serializers.CharField(required=False)
