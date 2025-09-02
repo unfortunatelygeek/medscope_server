@@ -4,6 +4,7 @@ from ..models import OtoImage
 
 class OtoImageUploadView(BaseImageUploadView):
     model_class = OtoImage
+    roboflow_model_id = "otoscopy-dataset-abc/2"
 
 class OtoReportView(BaseReportView):
     model_class = OtoImage

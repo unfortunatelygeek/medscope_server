@@ -4,6 +4,7 @@ from ..models import DermatoImage
 
 class DermatoImageUploadView(BaseImageUploadView):
     model_class = DermatoImage
+    roboflow_model_id = "pharyngitis-dataset-wifsx/3"
 
 class DermatoReportView(BaseReportView):
     model_class = DermatoImage
