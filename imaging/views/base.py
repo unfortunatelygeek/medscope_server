@@ -72,8 +72,8 @@ class BaseImageUploadView(APIView):
             recommendation = prediction.get("recommendation")
 
             response_data.append({
-                "image": image_path,
-                "transformed_image": transformed_image_path,
+                # "image": image_path,
+                # "transformed_image": transformed_image_path,
                 "transformed_image_base64": transformed_image_base64,
                 "prediction": prediction,
                 "confidence": confidence,
