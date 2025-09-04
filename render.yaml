@@ -4,8 +4,8 @@ services:
     env: python
     plan: free
     buildCommand: "pip install -r requirements.txt"
-    startCommand: "gunicorn core.wsgi:application"
     releaseCommand: "python manage.py migrate --noinput"
+    startCommand: "gunicorn core.wsgi:application"
     envVars:
       - key: DJANGO_SECRET_KEY
         generateValue: true
