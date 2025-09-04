@@ -9,10 +9,12 @@ if os.environ.get("RENDER") is None:  # Render sets its own env vars
 ROBOFLOW_API_KEY = os.getenv("ROBOFLOW_API_KEY")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
-def get_roboflow_prediction(image_path, model_id):
+import base64
+import requests
+
+def get_roboflow_prediction(image_bytes, model_id):
     url = f"https://detect.roboflow.com/{model_id}?api_key={ROBOFLOW_API_KEY}"
-    with open(image_path, "rb") as img_file:
-        response = requests.post(url, files={"file": img_file})
+    response = requests.post(url, files={"file": ("image.jpg", image_bytes, "image/jpeg")})
     response.raise_for_status()
     data = response.json()
     return data["predictions"][0] if data.get("predictions") else {"class": "unknown", "confidence": 0}

@@ -8,6 +8,7 @@ import cv2
 from ..utils.colour_utils import colour_transforms
 from ..models import PharyngoImage, DermatoImage, OtoImage
 import base64
+import numpy as np
 
 from drf_spectacular.utils import extend_schema, OpenApiRequest
 from rest_framework import serializers
@@ -55,18 +56,23 @@ class BaseImageUploadView(APIView):
 
         response_data = []
         for img in images:
-            obj = self.model_class.objects.create(image=img)
-            image_path = obj.image.path
+            file_bytes = np.frombuffer(img.read(), np.uint8)
+            image_for_txform = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)
+            # obj = self.model_class.objects.create(image=img)
+            # image_path = obj.image.path
 
-            image_for_txform = cv2.imread(image_path)
+            if image_for_txform is None:
+                return Response({"error": "Failed to decode uploaded image"}, status=400)
+
+            # image_for_txform = cv2.imread(image_path)
             transformed_image = colour_transforms(image_for_txform)
-            transformed_image_path = image_path.replace("scans/", "transformed/")
-            cv2.imwrite(transformed_image_path, transformed_image)
+            # transformed_image_path = image_path.replace("scans/", "transformed/")
 
-            with open(transformed_image_path, "rb") as f:
-                transformed_image_base64 = base64.b64encode(f.read()).decode("utf-8")
+            # cv2.imwrite(transformed_image_path, transformed_image)
+            _, buffer = cv2.imencode(".jpg", transformed_image)
+            transformed_image_base64 = base64.b64encode(buffer).decode("utf-8")
 
-            prediction = get_roboflow_prediction(image_path, self.roboflow_model_id)
+            prediction = get_roboflow_prediction(file_bytes.tobytes(), self.roboflow_model_id)
 
             confidence = prediction.get("confidence")
             recommendation = prediction.get("recommendation")
